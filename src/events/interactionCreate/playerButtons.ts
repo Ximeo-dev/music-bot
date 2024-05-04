@@ -32,25 +32,21 @@ export default event(Events.InteractionCreate, async ({ log }, interaction) => {
 					content: 'Вы должны находиться в канале с ботом',
 				})
 
-			const buttons = interaction.message.components
-			buttons[0].components[2] =
-				PLAYER_BUTTONS.pauseButton as unknown as ButtonComponent
-
 			if (!history.previousTrack) {
 				if (!history.currentTrack) return interaction.deferUpdate()
+				history.queue.node.seek(0)
 				const embed = EmbedGenerator.playerEmbed(
 					history.queue,
-					history.currentTrack
+					history.currentTrack,
+					0
 				)
-				history.queue.node.seek(0)
+				const buttons = interaction.message.components
+				buttons[0].components[2] =
+					PLAYER_BUTTONS.pauseButton as unknown as ButtonComponent
 				return interaction.update({ embeds: [embed], components: buttons })
 			}
-			const embed = EmbedGenerator.playerEmbed(
-				history.queue,
-				history.previousTrack
-			)
 			history.previous()
-			interaction.update({ embeds: [embed], components: buttons })
+			interaction.deferUpdate()
 		} else if (interaction.customId === 'rewind-track-btn') {
 			const queue = useQueue(interaction.guildId)
 
@@ -65,17 +61,28 @@ export default event(Events.InteractionCreate, async ({ log }, interaction) => {
 					ephemeral: true,
 					content: 'Вы должны находиться в канале с ботом',
 				})
-			const embed = EmbedGenerator.playerEmbed(queue, queue.currentTrack)
 
+			const buttons = interaction.message.components
+			buttons[0].components[2] =
+				PLAYER_BUTTONS.pauseButton as unknown as ButtonComponent
 			const currentProgress = queue.node.getTimestamp()?.current.value ?? 0
 			if (currentProgress <= 30 * 1000) {
 				queue.node.seek(0)
-			} else {
-				queue.node.seek(currentProgress - 30 * 1000)
+				const embed = EmbedGenerator.playerEmbed(queue, queue.currentTrack, 0)
+				return interaction.update({
+					embeds: [embed],
+					components: buttons,
+				})
 			}
+			queue.node.seek(currentProgress - 30 * 1000)
+			const embed = EmbedGenerator.playerEmbed(
+				queue,
+				queue.currentTrack,
+				currentProgress - 30 * 1000
+			)
 			interaction.update({
 				embeds: [embed],
-				components: interaction.message.components,
+				components: buttons,
 			})
 		} else if (
 			interaction.customId === 'play-track-btn' ||
@@ -120,7 +127,6 @@ export default event(Events.InteractionCreate, async ({ log }, interaction) => {
 						metadata: {
 							channel: interaction.channel,
 							requestedBy: interaction.member.id,
-							playerMessage: interaction.message,
 						},
 						volume: guildOptions.volume,
 						repeatMode: guildOptions.loopMode,
@@ -174,18 +180,27 @@ export default event(Events.InteractionCreate, async ({ log }, interaction) => {
 					ephemeral: true,
 					content: 'Вы должны находиться в канале с ботом',
 				})
-			const embed = EmbedGenerator.playerEmbed(queue, queue.currentTrack)
 
-			const currentProgress = queue.node.getTimestamp()?.current.value ?? 0
 			const currentTrackDuration = queue.currentTrack?.durationMS ?? 0
+			const currentProgress = queue.node.getTimestamp()?.current.value ?? 0
 			if (currentProgress >= currentTrackDuration - 30 * 1000) {
-				queue.node.seek(currentTrackDuration)
-			} else {
-				queue.node.seek(currentProgress + 30 * 1000)
+				queue.node.skip()
+				queue.node.setPaused(false)
+				return interaction.deferUpdate()
 			}
+
+			queue.node.seek(currentProgress + 30 * 1000)
+			const buttons = interaction.message.components
+			buttons[0].components[2] =
+				PLAYER_BUTTONS.pauseButton as unknown as ButtonComponent
+			const embed = EmbedGenerator.playerEmbed(
+				queue,
+				queue.currentTrack,
+				currentProgress + 30 * 1000
+			)
 			interaction.update({
 				embeds: [embed],
-				components: interaction.message.components,
+				components: buttons,
 			})
 		} else if (interaction.customId === 'next-track-btn') {
 			// TODO: Сделать, чтобы трек не уходил в историю, а оставался текущим в очереди, просто на конечной секунде
@@ -203,15 +218,9 @@ export default event(Events.InteractionCreate, async ({ log }, interaction) => {
 					content: 'Вы должны находиться в канале с ботом',
 				})
 
-			const buttons = interaction.message.components
-			buttons[0].components[2] =
-				PLAYER_BUTTONS.pauseButton as unknown as ButtonComponent
-
-			const embed = EmbedGenerator.playerEmbed(queue, queue.tracks.store[0])
-
 			queue.node.skip()
 			queue.node.setPaused(false)
-			interaction.update({ embeds: [embed], components: buttons })
+			interaction.deferUpdate()
 		} else if (
 			interaction.customId === 'shuffle-track-btn' ||
 			'shuffle-active-track-btn'

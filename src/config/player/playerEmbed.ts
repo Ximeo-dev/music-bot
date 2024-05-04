@@ -1,11 +1,16 @@
 import { GuildQueue, Track } from 'discord-player'
 import { EmbedBuilder } from 'discord.js'
 import { COLORS, EMOJIS } from './constants.js'
+import { formatDuration } from '../../utils/formatDuration.js'
 
 type EmbedInit = ConstructorParameters<typeof EmbedBuilder>[0]
 
 export class EmbedGenerator extends EmbedBuilder {
-	public static playerEmbed(queue: GuildQueue, track: Track) {
+	public static playerEmbed(
+		queue: GuildQueue,
+		track: Track,
+		curProgress?: number
+	) {
 		const embed = EmbedGenerator.create()
 			.setColor(COLORS.player)
 			.setAuthor({
@@ -13,6 +18,14 @@ export class EmbedGenerator extends EmbedBuilder {
 			})
 			.setThumbnail(track.thumbnail)
 			.setTitle(track.title)
+
+		embed.setDescription(
+			`${
+				curProgress || curProgress === 0
+					? formatDuration(curProgress)
+					: queue.node.getTimestamp()?.current.label
+			} | ${track.duration}`
+		)
 
 		// embed.setDescription(
 		// 	queue.node.createProgressBar({

@@ -7,15 +7,14 @@ const meta = new SlashCommandBuilder()
 	.setName('loop')
 	.setDescription('Выбрать режим повтора')
 	.addNumberOption(option =>
-		option.setName('mode').setDescription('Выберите режим').addChoices(
-			{
-				name: 'Автоматическое воспроизведение связанных песен существующей очереди',
-				value: QueueRepeatMode.OFF,
-			},
-			{ name: 'Повторять текущий трек', value: QueueRepeatMode.TRACK },
-			{ name: 'Повторять очередь', value: QueueRepeatMode.QUEUE },
-			{ name: 'Отключить повторение', value: QueueRepeatMode.OFF }
-		)
+		option
+			.setName('mode')
+			.setDescription('Выберите режим')
+			.addChoices(
+				{ name: 'Повторять текущий трек', value: QueueRepeatMode.TRACK },
+				{ name: 'Повторять очередь', value: QueueRepeatMode.QUEUE },
+				{ name: 'Отключить повторение', value: QueueRepeatMode.OFF }
+			)
 	)
 
 export default command(meta, async ({ interaction }) => {
@@ -55,9 +54,7 @@ export default command(meta, async ({ interaction }) => {
 				? 'Выключен'
 				: mode === 1
 				? 'Повторять текущий трек'
-				: mode === 2
-				? 'Повторять очередь'
-				: 'Автоматическое воспроизведение связанных песен существующей очереди'
+				: 'Повторять очередь'
 		}**`,
 	})
 })

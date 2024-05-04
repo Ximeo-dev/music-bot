@@ -56,7 +56,7 @@ const loopQueueButton = new ButtonBuilder()
 	.setEmoji(EMOJIS.loop_queue)
 	.setStyle(ButtonStyle.Secondary)
 
-const actionRowPlayerStart =
+export const actionRowPlayerStart =
 	new ActionRowBuilder<ButtonBuilder>().addComponents(
 		prevButton,
 		rewindButton,
@@ -65,7 +65,7 @@ const actionRowPlayerStart =
 		nextButton
 	)
 
-const actionRowPlayerPaused =
+export const actionRowPlayerPaused =
 	new ActionRowBuilder<ButtonBuilder>().addComponents(
 		prevButton,
 		rewindButton,
@@ -74,13 +74,13 @@ const actionRowPlayerPaused =
 		nextButton
 	)
 
-export const actionRowUtil =
+const actionRowUtil =
 	new ActionRowBuilder<ButtonBuilder>().addComponents(
 		shuffleInactiveButton,
 		loopInactiveButton
 	)
 
-export const actionRowUtilShuffled =
+const actionRowUtilShuffled =
 	new ActionRowBuilder<ButtonBuilder>().addComponents(
 		shuffleActiveButton,
 		loopInactiveButton
