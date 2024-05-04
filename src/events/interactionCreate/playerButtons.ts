@@ -223,7 +223,7 @@ export default event(Events.InteractionCreate, async ({ log }, interaction) => {
 			interaction.deferUpdate()
 		} else if (
 			interaction.customId === 'shuffle-track-btn' ||
-			'shuffle-active-track-btn'
+			interaction.customId === 'shuffle-active-track-btn'
 		) {
 			const queue = useQueue(interaction.guildId)
 			const db = useDatabase()
@@ -231,7 +231,7 @@ export default event(Events.InteractionCreate, async ({ log }, interaction) => {
 			if (!queue?.tracks) {
 				return interaction.reply({
 					ephemeral: true,
-					content: 'Очередь пустая',
+					content: 'В очереди нет треков',
 				})
 			}
 
@@ -275,11 +275,69 @@ export default event(Events.InteractionCreate, async ({ log }, interaction) => {
 				embeds: interaction.message.embeds,
 				components: buttons,
 			})
-		} else if (interaction.customId === 'loop-inactive-btn') {
-			interaction.reply({
-				ephemeral: true,
-				content: 'В разработке',
-			})
+		} else if (
+			interaction.customId === 'loop-inactive-btn' ||
+			interaction.customId === 'loop-track-btn' ||
+			interaction.customId === 'loop-queue-btn'
+		) {
+			const queue = useQueue(interaction.guildId)
+			const db = useDatabase()
+
+			if (!queue?.currentTrack) {
+				return interaction.reply({
+					ephemeral: true,
+					content: 'Сейчас ничего не играет',
+				})
+			}
+
+			if (queue.channel?.id !== interaction.member.voice.channel?.id)
+				return interaction.reply({
+					ephemeral: true,
+					content: 'Вы должны находиться в канале с ботом',
+				})
+
+			const guild = await db.guild.findOne({ id: interaction.guild.id })
+			const buttons = interaction.message.components
+			if (guild?.loopMode === 0) {
+				await db.guild.updateOne(
+					{ id: interaction.guild.id },
+					{ loopMode: 2 },
+					{ upsert: true }
+				)
+				buttons[1].components[1] =
+					PLAYER_BUTTONS.loopQueueButton as unknown as ButtonComponent
+				queue.setRepeatMode(2)
+				interaction.update({
+					embeds: interaction.message.embeds,
+					components: buttons,
+				})
+			} else if (guild?.loopMode === 2) {
+				await db.guild.updateOne(
+					{ id: interaction.guild.id },
+					{ loopMode: 1 },
+					{ upsert: true }
+				)
+				buttons[1].components[1] =
+					PLAYER_BUTTONS.loopTrackButton as unknown as ButtonComponent
+				queue.setRepeatMode(1)
+				interaction.update({
+					embeds: interaction.message.embeds,
+					components: buttons,
+				})
+			} else {
+				await db.guild.updateOne(
+					{ id: interaction.guild.id },
+					{ loopMode: 0 },
+					{ upsert: true }
+				)
+				buttons[1].components[1] =
+					PLAYER_BUTTONS.loopInactiveButton as unknown as ButtonComponent
+				queue.setRepeatMode(0)
+				interaction.update({
+					embeds: interaction.message.embeds,
+					components: buttons,
+				})
+			}
 		}
 	} catch (e) {
 		log(e)
