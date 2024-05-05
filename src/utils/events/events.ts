@@ -2,7 +2,7 @@ import type { ClientEvents, Awaitable, Client } from 'discord.js'
 
 export { Events } from 'discord.js'
 
-type LogMethod = (...args: unknown[]) => void
+export type LogMethod = (...args: unknown[]) => void
 export type EventKeys = keyof ClientEvents
 
 export interface EventProps {
@@ -31,7 +31,6 @@ export function registerEvents(client: Client, events: Event[]): void {
 	for (const { key, callback } of events) {
 		client.on(key, (...args) => {
 			const log = console.log.bind(console, `[Event: ${key}]`)
-
 			try {
 				callback({ client, log }, ...args)
 			} catch (error) {

@@ -5,12 +5,13 @@ import {
 	useMainPlayer,
 	useQueue,
 } from 'discord-player'
-import { Events, event } from '../../utils/index.js'
+import { LogMethod } from '../../utils/index.js'
 import { useDatabase } from '../../hooks/useDatabase.js'
 import { fetchPlayerOptions } from '../../config/player/playerOptions.js'
 import {
 	ActionRowBuilder,
 	ButtonComponent,
+	ButtonInteraction,
 	ModalBuilder,
 	TextInputBuilder,
 	TextInputStyle,
@@ -18,9 +19,11 @@ import {
 import { EmbedGenerator } from '../../config/player/playerEmbed.js'
 import { PLAYER_BUTTONS } from '../../config/player/playerButtons.js'
 
-export default event(Events.InteractionCreate, async ({ log }, interaction) => {
-	if (!interaction.inCachedGuild()) return
-	if (!interaction.isButton()) return
+export const playerButtonsInteraction = async (
+	log: LogMethod,
+	interaction: ButtonInteraction<'cached'>
+) => {
+	const t1 = performance.now()
 
 	try {
 		if (interaction.customId === 'prev-track-btn') {
@@ -151,6 +154,8 @@ export default event(Events.InteractionCreate, async ({ log }, interaction) => {
 						deaf: true,
 					},
 				})
+				const t2 = performance.now()
+				log(t2 - t1, 'ms')
 				return interaction.deferUpdate()
 			}
 
@@ -166,12 +171,17 @@ export default event(Events.InteractionCreate, async ({ log }, interaction) => {
 				buttons[0].components[2] =
 					PLAYER_BUTTONS.playButton as unknown as ButtonComponent
 				queue.node.setPaused(true)
-				return interaction.update({ embeds: [embed], components: buttons })
+				interaction.update({ embeds: [embed], components: buttons })
+				const t2 = performance.now()
+				log(t2 - t1, 'ms')
+				return
 			}
 			buttons[0].components[2] =
 				PLAYER_BUTTONS.pauseButton as unknown as ButtonComponent
 			queue.node.setPaused(false)
 			interaction.update({ embeds: [embed], components: buttons })
+			const t2 = performance.now()
+			log(t2 - t1, 'ms')
 		} else if (interaction.customId === 'forward-track-btn') {
 			const queue = useQueue(interaction.guildId)
 
@@ -383,4 +393,4 @@ export default event(Events.InteractionCreate, async ({ log }, interaction) => {
 	} catch (e) {
 		log(e)
 	}
-})
+}

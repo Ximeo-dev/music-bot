@@ -1,11 +1,12 @@
 import { useQueue } from 'discord-player'
 import { useDatabase } from '../../hooks/useDatabase.js'
-import { Events, event } from '../../utils/index.js'
+import { LogMethod } from '../../utils/index.js'
+import { ModalSubmitInteraction } from 'discord.js'
 
-export default event(Events.InteractionCreate, async ({ log }, interaction) => {
-	if (!interaction.inCachedGuild()) return
-	if (!interaction.isModalSubmit()) return
-
+export const modalsInteraction = async (
+	log: LogMethod,
+	interaction: ModalSubmitInteraction<'cached'>
+) => {
 	try {
 		if (interaction.customId === 'volume-modal') {
 			let volume = parseInt(
@@ -39,4 +40,4 @@ export default event(Events.InteractionCreate, async ({ log }, interaction) => {
 	} catch (e) {
 		log(e)
 	}
-})
+}

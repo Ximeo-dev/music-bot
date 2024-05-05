@@ -1,10 +1,11 @@
 import { useMainPlayer } from 'discord-player'
-import { event, Events } from '../../utils/index.js'
+import { LogMethod } from '../../utils/index.js'
+import { AutocompleteInteraction } from 'discord.js'
 
-export default event(Events.InteractionCreate, async ({ log }, interaction) => {
-	if (!interaction.isAutocomplete() || interaction.commandName !== 'play')
-		return
-
+export const playAutocomplete = async (
+	log: LogMethod,
+	interaction: AutocompleteInteraction<'cached'>
+) => {
 	const query = interaction.options.getString('search', true)
 	if (!query.length) return interaction.respond([])
 
@@ -18,10 +19,13 @@ export default event(Events.InteractionCreate, async ({ log }, interaction) => {
 
 		const results = []
 
-		if (data.playlist && data.playlist.url.length < 100) results.push({
-			name: `🎶 ${data.playlist.title.slice(0, 60)} | Треков: ${data.playlist.tracks.length}`,
-			value: data.playlist.url,
-		})
+		if (data.playlist && data.playlist.url.length < 100)
+			results.push({
+				name: `🎶 ${data.playlist.title.slice(0, 60)} | Треков: ${
+					data.playlist.tracks.length
+				}`,
+				value: data.playlist.url,
+			})
 
 		results.push(
 			...data.tracks
@@ -37,4 +41,4 @@ export default event(Events.InteractionCreate, async ({ log }, interaction) => {
 	} catch {
 		return interaction.respond([]).catch(() => {})
 	}
-})
+}
