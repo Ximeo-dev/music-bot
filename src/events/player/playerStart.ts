@@ -37,11 +37,11 @@ export default playerEvent('playerStart', async ({ log }, queue, track) => {
 			? PLAYER_BUTTONS.loopInactiveButton
 			: guild?.loopMode === 1
 			? PLAYER_BUTTONS.loopTrackButton
-			: PLAYER_BUTTONS.loopQueueButton
+			: PLAYER_BUTTONS.loopQueueButton,
+		PLAYER_BUTTONS.volumeButton
 	)
 
 	if (guild?.isShuffling) queue.enableShuffle()
-	if (guild?.loopMode) queue.setRepeatMode(guild?.loopMode)
 
 	const components = [actionRowPlayerStart, newRow]
 	queue.metadata.channel

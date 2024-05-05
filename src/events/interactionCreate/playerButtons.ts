@@ -8,7 +8,13 @@ import {
 import { Events, event } from '../../utils/index.js'
 import { useDatabase } from '../../hooks/useDatabase.js'
 import { fetchPlayerOptions } from '../../config/player/playerOptions.js'
-import { ButtonComponent } from 'discord.js'
+import {
+	ActionRowBuilder,
+	ButtonComponent,
+	ModalBuilder,
+	TextInputBuilder,
+	TextInputStyle,
+} from 'discord.js'
 import { EmbedGenerator } from '../../config/player/playerEmbed.js'
 import { PLAYER_BUTTONS } from '../../config/player/playerButtons.js'
 
@@ -203,7 +209,6 @@ export default event(Events.InteractionCreate, async ({ log }, interaction) => {
 				components: buttons,
 			})
 		} else if (interaction.customId === 'next-track-btn') {
-			// TODO: Сделать, чтобы трек не уходил в историю, а оставался текущим в очереди, просто на конечной секунде
 			const queue = useQueue(interaction.guildId)
 
 			if (!queue?.currentTrack)
@@ -338,6 +343,42 @@ export default event(Events.InteractionCreate, async ({ log }, interaction) => {
 					components: buttons,
 				})
 			}
+		} else if (interaction.customId === 'volume-btn') {
+			const queue = useQueue(interaction.guild.id)
+			const db = useDatabase()
+
+			if (!queue?.currentTrack) {
+				return interaction.reply({
+					ephemeral: true,
+					content: 'Сейчас ничего не играет',
+				})
+			}
+
+			if (queue.channel?.id !== interaction.member.voice.channel?.id)
+				return interaction.reply({
+					ephemeral: true,
+					content: 'Вы должны находиться в канале с ботом',
+				})
+
+			const modal = new ModalBuilder()
+				.setCustomId('volume-modal')
+				.setTitle('Настройка громкости')
+
+			const volume = new TextInputBuilder()
+				.setCustomId('volume-input')
+				.setLabel('Громкость')
+				.setStyle(TextInputStyle.Short)
+				.setPlaceholder('Укажите громкость от 1 до 100')
+				.setRequired(true)
+				.setMinLength(1)
+				.setMaxLength(3)
+
+			const actionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(
+				volume
+			)
+			modal.addComponents(actionRow)
+
+			await interaction.showModal(modal)
 		}
 	} catch (e) {
 		log(e)

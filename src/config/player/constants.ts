@@ -20,6 +20,7 @@ export const EMOJIS = {
 	loop_inactive: '<:loop_inactive:1234900005916250235>',
 	loop_track: '<:loop_track:1234900125940322324>',
 	loop_queue: '<:loop_queue:1234900053923987497>',
+	volume: '<:volume:1236611551893520485>'
 }
 
 export const DiscordPlayerOptions: DiscordPlayerConfig = {

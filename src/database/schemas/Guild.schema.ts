@@ -21,7 +21,7 @@ export const GuildSchema = new Schema<IGuildSchema>(
 		volume: {
 			type: Number,
 			default: 100,
-			min: 0,
+			min: 1,
 			max: 100,
 		},
 		loopMode: {

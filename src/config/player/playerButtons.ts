@@ -56,6 +56,11 @@ const loopQueueButton = new ButtonBuilder()
 	.setEmoji(EMOJIS.loop_queue)
 	.setStyle(ButtonStyle.Secondary)
 
+const volumeButton = new ButtonBuilder()
+	.setCustomId('volume-btn')
+	.setEmoji(EMOJIS.volume)
+	.setStyle(ButtonStyle.Primary)
+
 export const actionRowPlayerStart =
 	new ActionRowBuilder<ButtonBuilder>().addComponents(
 		prevButton,
@@ -74,11 +79,10 @@ export const actionRowPlayerPaused =
 		nextButton
 	)
 
-const actionRowUtil =
-	new ActionRowBuilder<ButtonBuilder>().addComponents(
-		shuffleInactiveButton,
-		loopInactiveButton
-	)
+const actionRowUtil = new ActionRowBuilder<ButtonBuilder>().addComponents(
+	shuffleInactiveButton,
+	loopInactiveButton
+)
 
 const actionRowUtilShuffled =
 	new ActionRowBuilder<ButtonBuilder>().addComponents(
@@ -98,6 +102,7 @@ export const PLAYER_BUTTONS = {
 	loopInactiveButton,
 	loopTrackButton,
 	loopQueueButton,
+	volumeButton,
 }
 
 export const State = {
