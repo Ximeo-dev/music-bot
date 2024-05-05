@@ -257,7 +257,7 @@ export default event(Events.InteractionCreate, async ({ log }, interaction) => {
 				)
 				buttons[1].components[0] =
 					PLAYER_BUTTONS.shuffleActiveButton as unknown as ButtonComponent
-				queue.tracks.shuffle()
+				queue.enableShuffle()
 				return interaction.update({
 					embeds: interaction.message.embeds,
 					components: buttons,
@@ -270,7 +270,7 @@ export default event(Events.InteractionCreate, async ({ log }, interaction) => {
 			)
 			buttons[1].components[0] =
 				PLAYER_BUTTONS.shuffleInactiveButton as unknown as ButtonComponent
-			queue.tracks.shuffle()
+			queue.disableShuffle()
 			interaction.update({
 				embeds: interaction.message.embeds,
 				components: buttons,
