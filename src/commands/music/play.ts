@@ -39,8 +39,8 @@ export default command(meta, async ({ interaction, log }) => {
 			content: `Бот уже используется в канале ${queue.channel}`,
 		})
 
-	if (interaction.guild.members.me?.voice?.mute)
-		interaction.guild.members.me?.voice.setMute(false)
+	// if (interaction.guild.members.me?.voice?.mute)
+	// 	interaction.guild.members.me?.voice.setMute(false)
 
 	const result = await player
 		.search(query, { requestedBy: interaction.member })
@@ -84,7 +84,8 @@ export default command(meta, async ({ interaction, log }) => {
 			serialize(track)
 		)
 
-		await db.guild.updateOne({ id: interaction.guild.id }, { queue: tracks })
+		if (tracks.length)
+			await db.guild.updateOne({ id: interaction.guild.id }, { queue: tracks })
 
 		return interaction.editReply(
 			searchResult.playlist

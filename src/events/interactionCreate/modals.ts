@@ -3,7 +3,7 @@ import { useDatabase } from '../../hooks/useDatabase.js'
 import { LogMethod } from '../../utils/index.js'
 import { ModalSubmitInteraction } from 'discord.js'
 
-export const modalsInteraction = async (
+export const modals = async (
 	log: LogMethod,
 	interaction: ModalSubmitInteraction<'cached'>
 ) => {

@@ -19,12 +19,10 @@ import {
 import { EmbedGenerator } from '../../config/player/playerEmbed.js'
 import { PLAYER_BUTTONS } from '../../config/player/playerButtons.js'
 
-export const playerButtonsInteraction = async (
+export const playerButtons = async (
 	log: LogMethod,
 	interaction: ButtonInteraction<'cached'>
 ) => {
-	const t1 = performance.now()
-
 	try {
 		if (interaction.customId === 'prev-track-btn') {
 			const history = useHistory(interaction.guildId)
@@ -113,9 +111,9 @@ export const playerButtonsInteraction = async (
 						content: 'Вы должны находиться в голосовом канале',
 					})
 				const player = useMainPlayer()
-				const tracks = guild?.queue.map(
-					track => deserialize(player, track) as Track<unknown>
-				)
+				const tracks = guild?.queue
+					.filter(track => track)
+					.map(track => deserialize(player, track) as Track<unknown>)
 				const playlist = player.createPlaylist({
 					author: {
 						name: '',
@@ -154,8 +152,6 @@ export const playerButtonsInteraction = async (
 						deaf: true,
 					},
 				})
-				const t2 = performance.now()
-				log(t2 - t1, 'ms')
 				return interaction.deferUpdate()
 			}
 
@@ -171,17 +167,12 @@ export const playerButtonsInteraction = async (
 				buttons[0].components[2] =
 					PLAYER_BUTTONS.playButton as unknown as ButtonComponent
 				queue.node.setPaused(true)
-				interaction.update({ embeds: [embed], components: buttons })
-				const t2 = performance.now()
-				log(t2 - t1, 'ms')
-				return
+				return interaction.update({ embeds: [embed], components: buttons })
 			}
 			buttons[0].components[2] =
 				PLAYER_BUTTONS.pauseButton as unknown as ButtonComponent
 			queue.node.setPaused(false)
 			interaction.update({ embeds: [embed], components: buttons })
-			const t2 = performance.now()
-			log(t2 - t1, 'ms')
 		} else if (interaction.customId === 'forward-track-btn') {
 			const queue = useQueue(interaction.guildId)
 
@@ -254,12 +245,6 @@ export const playerButtonsInteraction = async (
 				return interaction.reply({
 					ephemeral: true,
 					content: 'Вы должны находиться в канале с ботом',
-				})
-
-			if (queue.size === 0)
-				return interaction.reply({
-					ephemeral: true,
-					content: 'В очереди только один трек',
 				})
 
 			const guild = await db.guild.findOne({ id: interaction.guild.id })
@@ -355,7 +340,6 @@ export const playerButtonsInteraction = async (
 			}
 		} else if (interaction.customId === 'volume-btn') {
 			const queue = useQueue(interaction.guild.id)
-			const db = useDatabase()
 
 			if (!queue?.currentTrack) {
 				return interaction.reply({

@@ -11,12 +11,14 @@ import {
 	actionRowPlayerStart,
 } from '../../config/player/playerButtons.js'
 import { useDatabase } from '../../hooks/useDatabase.js'
+import expiredPlayer from '../../validators/expiredPlayer.js'
 
 export default playerEvent('playerStart', async ({ log }, queue, track) => {
 	const embed = EmbedGenerator.playerEmbed(queue, track)
 	const playerMessage = queue.metadata.playerMessage
+	const shouldSendPlayerMessage = await expiredPlayer(playerMessage)
 
-	if (playerMessage) {
+	if (shouldSendPlayerMessage === false) {
 		const buttons = playerMessage.components
 		buttons[0].components[2] =
 			PLAYER_BUTTONS.pauseButton as unknown as ButtonComponent
@@ -25,6 +27,17 @@ export default playerEvent('playerStart', async ({ log }, queue, track) => {
 			components: playerMessage.components,
 		})
 		return
+	}
+
+	if (shouldSendPlayerMessage === true) {
+		return queue.metadata.channel
+			.send({
+				embeds: [embed],
+				components: playerMessage.components,
+			})
+			.then(async (msg: Message) => {
+				queue.setMetadata({ ...queue.metadata, playerMessage: msg })
+			})
 	}
 
 	const db = useDatabase()

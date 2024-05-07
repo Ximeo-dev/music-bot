@@ -34,6 +34,6 @@
     "mediaplex": "^0.0.9",
     "mongoose": "^8.3.2",
     "ym-api-meowed": "^1.3.1",
-    "youtube-ext": "^1.1.16"
+    "youtube-ext": "^1.1.25"
   }
 }

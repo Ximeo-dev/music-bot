@@ -11,7 +11,6 @@ import { YandexMusicExtractor } from './extractors/YandexMusicExtractor.js'
 import { DiscordPlayerOptions } from './config/player/constants.js'
 import { ClientIntents } from './config/constants.js'
 import './database/db.js'
-
 const client = new Client({
 	intents: [ClientIntents],
 })
@@ -36,6 +35,8 @@ player.extractors.register(YandexMusicExtractor, {
 player.extractors.loadDefault(ext => {
 	return !DiscordPlayerOptions.disableSources.includes(ext)
 }, DiscordPlayerOptions.extractorConfig)
+
+// player.extractors.loadDefault(ext => ext === 'YouTubeExtractor')
 
 registerEvents(client, Events)
 registerPlayerEvents(player, PlayerEvents)
