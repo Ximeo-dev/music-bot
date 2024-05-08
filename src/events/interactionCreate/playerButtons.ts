@@ -73,7 +73,7 @@ export const playerButtons = async (
 			buttons[0].components[2] =
 				PLAYER_BUTTONS.pauseButton as unknown as ButtonComponent
 			const currentProgress = queue.node.getTimestamp()?.current.value ?? 0
-			if (currentProgress <= 30 * 1000) {
+			if (currentProgress <= 20 * 1000) {
 				queue.node.seek(0)
 				const embed = EmbedGenerator.playerEmbed(queue, queue.currentTrack, 0)
 				return interaction.update({
@@ -81,11 +81,11 @@ export const playerButtons = async (
 					components: buttons,
 				})
 			}
-			queue.node.seek(currentProgress - 30 * 1000)
+			queue.node.seek(currentProgress - 20 * 1000)
 			const embed = EmbedGenerator.playerEmbed(
 				queue,
 				queue.currentTrack,
-				currentProgress - 30 * 1000
+				currentProgress - 20 * 1000
 			)
 			interaction.update({
 				embeds: [embed],

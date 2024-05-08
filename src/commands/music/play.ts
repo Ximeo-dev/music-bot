@@ -17,10 +17,20 @@ const meta = new SlashCommandBuilder()
 			.setRequired(true)
 			.setAutocomplete(true)
 	)
+	.addStringOption(option =>
+		option
+			.setName('mode')
+			.setDescription('Режим добавления в очередь')
+			.addChoices({
+				name: 'Вне очереди',
+				value: 'out-of-queue',
+			})
+	)
 
 export default command(meta, async ({ interaction, log }) => {
 	if (!interaction.inCachedGuild()) return
 	const query = interaction.options.getString('search', true)
+	const mode = interaction.options.getString('mode')
 	const player = useMainPlayer()
 	const queue = useQueue(interaction.guild.id)
 	const db = useDatabase()
@@ -53,6 +63,30 @@ export default command(meta, async ({ interaction, log }) => {
 		})
 
 	await interaction.deferReply()
+
+	if (mode && queue) {
+		if (result.playlist) {
+			result.playlist.tracks
+				.reverse()
+				.forEach(track => queue.insertTrack(track))
+			interaction.editReply(
+				`${EMOJIS.playlist} Плейлист **${result.playlist.title}** добавлен в начало очереди. Треков: **\`${result.playlist.tracks.length}\`**`
+			)
+		} else {
+			const track = result.tracks[0]
+			queue.insertTrack(track)
+			interaction.editReply(
+				`${EMOJIS.musical_note} **${track.title}** добавлен в начало очереди`
+			)
+		}
+		const tracks = [queue.currentTrack, ...queue.tracks.store].map(track =>
+			serialize(track)
+		)
+
+		if (tracks.length)
+			await db.guild.updateOne({ id: interaction.guild.id }, { queue: tracks })
+		return
+	}
 
 	try {
 		const guildOptions = await fetchPlayerOptions(interaction.guild.id)
