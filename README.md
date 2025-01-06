@@ -1,6 +1,6 @@
-This is a discord music bot bootstrapped with <a href="https://discord.js.org/" target="_blank" rel="noopener noreferrer">Discord.js</a> and <a href="https://discord-player.js.org/" target="_blank" rel="noopener noreferrer">Discord Player</a> with easy control, beautiful design and autocomplete
+This is a discord music bot bootstrapped with [Discord.js](https://discord.js.org/) and [Discord Player](https://discord-player.js.org/) with easy control, beautiful design and autocomplete
 
-Bot can play music with `Yandex Music` and default services (see <a href="https://discord-player.js.org/docs/creating-a-music-bot/02_extractors_integration" target="_blank" rel="noopener noreferrer">Extractors Integration</a>)
+Bot can play music with `Yandex Music` and default services (see [Extractors Integration](https://discord-player.js.org/docs/creating-a-music-bot/02_extractors_integration))
 
 ## Getting Started
 
@@ -27,5 +27,5 @@ npm start
 
 **_Slash commands deploy:_**
 
-For the test mode (only for the test guild) use `npm run deploy`.  
-For the production mode (all guilds) use `npm run deploy-prod`.
+For the test mode (only for the test guild) use `npm run deploy`  
+For the production mode (all guilds) use `npm run deploy-prod`
