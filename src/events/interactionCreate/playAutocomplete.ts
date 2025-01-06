@@ -90,7 +90,7 @@ export const playAutocomplete = async (
 		// 	return interaction.respond(result)
 		// }
 
-		// Добавить возможность поиска всех плейлистов юзера (https://music.yandex.ru/users/zavod3433/playlists/*)
+		// Add the ability to search all playlists of the user (https://music.yandex.ru/users/zavod3433/playlists/*)
 		const data = await player.search(query, { requestedBy: interaction.user })
 
 		if (!data.hasTracks()) return interaction.respond([])

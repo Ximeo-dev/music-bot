@@ -26,10 +26,12 @@ const player = new Player(client, {
 	},
 })
 
-player.extractors.register(YandexMusicExtractor, {
-	access_token: getEnvVar('YANDEX_ACCESS_TOKEN'),
-	uid: getEnvVar('YANDEX_UID'),
-})
+if (getEnvVar('YANDEX_MUSIC_INTEGRATION') !== 'OFF') {
+	player.extractors.register(YandexMusicExtractor, {
+		access_token: getEnvVar('YANDEX_ACCESS_TOKEN'),
+		uid: getEnvVar('YANDEX_UID'),
+	})
+}
 
 player.extractors.loadDefault(ext => {
 	return !DiscordPlayerOptions.disableSources.includes(ext)
